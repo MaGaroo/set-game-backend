@@ -16,10 +16,13 @@ type Service struct {
 func NewService(cfg *Config) (service *Service, err error) {
 	service = &Service{}
 	err = nil
+
 	if service.DB, err = gorm.Open("sqlite3", cfg.DBAddress); err != nil {
 		return nil, err
 	}
+
 	service.config = *cfg
+
 	service.upgrader = websocket.Upgrader{
 		ReadBufferSize:  1024,
 		WriteBufferSize: 1024,
