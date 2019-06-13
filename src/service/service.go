@@ -2,6 +2,7 @@ package service
 
 import (
 	"github.com/jinzhu/gorm"
+	_ "github.com/mattn/go-sqlite3"
 	"net/http"
 	"github.com/gorilla/websocket"
 )
@@ -23,6 +24,12 @@ func NewService(cfg *Config) (service *Service, err error) {
 		ReadBufferSize:  1024,
 		WriteBufferSize: 1024,
 	}
+
+	if err = service.AutoMigrate(); err != nil {
+		service.DB.Close()
+		return nil, err
+	}
+
 	return service, nil
 }
 
@@ -30,4 +37,8 @@ func (service *Service) Run() (err error) {
 	service.setupRoutes()
 	err = http.ListenAndServe(":"+service.config.Port, nil)
 	return err
+}
+
+func (service *Service) AutoMigrate() error {
+	return nil
 }
