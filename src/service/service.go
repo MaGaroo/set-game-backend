@@ -3,11 +3,13 @@ package service
 import (
 	"github.com/jinzhu/gorm"
 	"net/http"
+	"github.com/gorilla/websocket"
 )
 
 type Service struct {
-	DB     *gorm.DB
-	config Config
+	DB       *gorm.DB
+	config   Config
+	upgrader websocket.Upgrader
 }
 
 func NewService(cfg *Config) (service *Service, err error) {
@@ -17,6 +19,10 @@ func NewService(cfg *Config) (service *Service, err error) {
 		return nil, err
 	}
 	service.config = *cfg
+	service.upgrader = websocket.Upgrader{
+		ReadBufferSize:  1024,
+		WriteBufferSize: 1024,
+	}
 	return service, nil
 }
 
