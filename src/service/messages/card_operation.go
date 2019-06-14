@@ -1,21 +1,13 @@
 package messages
 
-type AddCard struct {
+import "fmt"
+
+type UpdateCard struct {
 	Card   int8
 	Row    int8
 	Column int8
 }
 
-type RemoveCardByCard struct {
-	Card int8
-}
-
-type RemoveCardByPlace struct {
-	Row    int8
-	Column int8
-}
-
-type ReplaceCard struct {
-	Card1 int8
-	Card2 int8
+func (m UpdateCard) ToString() string {
+	return fmt.Sprintf("card %d %d %d", m.Card, m.Row, m.Column)
 }
