@@ -7,6 +7,6 @@ type Player struct {
 	Username string
 	RoomID   uint
 	Room     Room `gorm:"foreignkey:RoomID"`
-	Score    int64
+	Score    int8
 	Token    string
 }
