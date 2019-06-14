@@ -51,10 +51,13 @@ func (service *Service) register(conn *websocket.Conn) *models.Player {
 		if err != nil {
 			return nil
 		}
+
 		player, err := service.getOrCreatePlayer(req.PlayerToken, req.Username, room)
 		if err != nil {
 			return nil
 		}
+		service.connections[player.Token] = conn
+
 		return player
 	}
 	return nil
