@@ -8,9 +8,10 @@ import (
 )
 
 type Service struct {
-	DB       *gorm.DB
-	config   Config
-	upgrader websocket.Upgrader
+	DB          *gorm.DB
+	config      Config
+	upgrader    websocket.Upgrader
+	connections map[string]websocket.Conn
 }
 
 func NewService(cfg *Config) (service *Service, err error) {
@@ -32,6 +33,8 @@ func NewService(cfg *Config) (service *Service, err error) {
 		service.DB.Close()
 		return nil, err
 	}
+
+	service.connections = make(map[string]websocket.Conn)
 
 	return service, nil
 }
