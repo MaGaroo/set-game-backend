@@ -44,7 +44,3 @@ func (service *Service) Run() (err error) {
 	err = http.ListenAndServe(":"+service.config.Port, nil)
 	return err
 }
-
-func (service *Service) AutoMigrate() error {
-	return nil
-}
