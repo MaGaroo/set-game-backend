@@ -32,6 +32,6 @@ type IntroResponse struct {
 	PlayerToken string
 }
 
-func (m IntroResponse) ToString() string {
-	return fmt.Sprintf("intro %s %s", m.Username, m.PlayerToken)
+func (m IntroResponse) ToBytes() []byte {
+	return []byte(fmt.Sprintf("intro %s %s", m.Username, m.PlayerToken))
 }

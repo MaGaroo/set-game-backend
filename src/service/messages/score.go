@@ -7,6 +7,6 @@ type UpdateScore struct {
 	Score    int8
 }
 
-func (m *UpdateScore) ToString() string {
-	return fmt.Sprintf("score %s %d", m.Username, m.Score)
+func (m *UpdateScore) ToBytes() []byte {
+	return []byte(fmt.Sprintf("score %s %d", m.Username, m.Score))
 }
