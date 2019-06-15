@@ -1,13 +1,17 @@
 package messages
 
-import "fmt"
+import (
+	"fmt"
+	"encoding/json"
+)
 
 type UpdateCard struct {
-	Card   int
-	Row    int
-	Column int
+	Cards []int
 }
 
 func (m UpdateCard) ToBytes() []byte {
-	return []byte(fmt.Sprintf("card %d %d %d", m.Card, m.Row, m.Column))
+	if cards, err := json.Marshal(m.Cards); err == nil {
+		return []byte(fmt.Sprintf("card %s", cards))
+	}
+	return []byte{}
 }
