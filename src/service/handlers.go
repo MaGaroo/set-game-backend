@@ -105,7 +105,8 @@ func (service *Service) play(player *models.Player, room *models.Room, conn *web
 		}
 
 		// check if the guess was true
-		trueGuess, newCards := game.Check(guess)
+		trueGuess, newCards, endGame := game.Check(guess)
+		service.saveGame(game)
 		if !trueGuess {
 			continue
 		}
@@ -118,9 +119,20 @@ func (service *Service) play(player *models.Player, room *models.Room, conn *web
 		var listeners []models.Player
 		service.getRoomPeople(room, &listeners)
 
+		winner := ""
+		winnerScore := int8(0)
+		if endGame {
+			for _, person := range listeners {
+				if person.Score > winnerScore {
+					winner = person.Username
+					winnerScore = person.Score
+				}
+			}
+		}
+
 		// send updates to people
 		for _, listener := range listeners {
-			go func(places [3][2]int, values [3]int, conn *websocket.Conn) {
+			go func(cards []int, conn *websocket.Conn) {
 				if conn == nil {
 					return
 				}
@@ -128,14 +140,15 @@ func (service *Service) play(player *models.Player, room *models.Room, conn *web
 					Username: player.Username,
 					Score:    player.Score,
 				}.ToBytes())
-				for i := 0; i < 3; i++ {
-					conn.WriteMessage(1, messages.UpdateCard{
-						Row:    places[i][0],
-						Column: places[i][1],
-						Card:   values[i],
+				conn.WriteMessage(1, messages.UpdateCard{
+					Cards: newCards,
+				}.ToBytes())
+				if endGame {
+					conn.WriteMessage(1, messages.EndGame{
+						Winner: winner,
 					}.ToBytes())
 				}
-			}(guess, newCards, service.connections[listener.Token])
+			}(newCards, service.connections[listener.Token])
 		}
 	}
 

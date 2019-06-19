@@ -76,3 +76,7 @@ func (service *Service) getRoomPeople(room *models.Room, players *[]models.Playe
 func (service *Service) savePlayer(player *models.Player) {
 	service.DB.Save(player)
 }
+
+func (service *Service) saveGame(game *models.Game) {
+	service.DB.Save(game)
+}
