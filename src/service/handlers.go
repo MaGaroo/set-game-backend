@@ -8,6 +8,7 @@ import (
 	"set-game/src/service/messages"
 	"strings"
 	"encoding/json"
+	"strconv"
 )
 
 func (service *Service) setupRoutes() {
@@ -133,6 +134,9 @@ func (service *Service) play(player *models.Player, room *models.Room, conn *web
 		guess := make([]int, 3)
 		badFormat := false
 		for i := 0; i < 3; i++ {
+			if guess[i], err = strconv.Atoi(messageSlice[i+1]); err != nil {
+				badFormat = true
+			}
 			for j := 0; j < i; j++ {
 				if guess[i] == guess[j] {
 					badFormat = true
