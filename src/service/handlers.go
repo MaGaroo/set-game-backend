@@ -124,13 +124,13 @@ func (service *Service) play(player *models.Player, room *models.Room, conn *web
 
 		// TODO move the following part(parse) to messages package
 		// basic format checking of the message
+		log.Println("Parsing a guess")
 		messageSlice := strings.Fields(string(p))
 		if messageType != 1 || len(messageSlice) != 7 || messageSlice[0] != "guess" {
 			continue
 		}
 
 		// parse the message
-		log.Println("Parsing a guess")
 		var guess [3][2]int
 		badFormat := false
 		for i := 0; i < 6; i++ {
