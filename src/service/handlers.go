@@ -7,7 +7,6 @@ import (
 	"set-game/src/models"
 	"set-game/src/service/messages"
 	"strings"
-	"strconv"
 	"encoding/json"
 )
 
@@ -126,17 +125,18 @@ func (service *Service) play(player *models.Player, room *models.Room, conn *web
 		// basic format checking of the message
 		log.Println("Parsing a guess")
 		messageSlice := strings.Fields(string(p))
-		if messageType != 1 || len(messageSlice) != 7 || messageSlice[0] != "guess" {
+		if messageType != 1 || len(messageSlice) != 4 || messageSlice[0] != "guess" {
 			continue
 		}
 
 		// parse the message
-		var guess [3][2]int
+		guess := make([]int, 3)
 		badFormat := false
-		for i := 0; i < 6; i++ {
-			guess[i>>1][i&1], err = strconv.Atoi(messageSlice[i+1])
-			if err != nil {
-				badFormat = true
+		for i := 0; i < 3; i++ {
+			for j := 0; j < i; j++ {
+				if guess[i] == guess[j] {
+					badFormat = true
+				}
 			}
 		}
 		if badFormat {

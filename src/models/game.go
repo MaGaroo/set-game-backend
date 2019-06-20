@@ -55,14 +55,10 @@ func (game *Game) Start() error {
 	return nil
 }
 
-func (game *Game) Check(guess [3][2]int) (bool, []int, bool) {
+func (game *Game) Check(guessPositions []int) (bool, []int, bool) {
 	var tableCards []int
 	if err := json.Unmarshal([]byte(game.Table), &tableCards); err != nil {
 		return false, []int{}, false
-	}
-	guessPositions := make([]int, 3)
-	for i := 0; i < 3; i++ {
-		guessPositions[i] = guess[i][0]*3 + guess[i][1]
 	}
 	if !setgame.PositionsMakeSet(tableCards, guessPositions) {
 		return false, []int{}, false
