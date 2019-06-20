@@ -8,6 +8,7 @@ import (
 	"set-game/src/service/messages"
 	"strings"
 	"strconv"
+	"encoding/json"
 )
 
 func (service *Service) setupRoutes() {
@@ -17,9 +18,17 @@ func (service *Service) setupRoutes() {
 }
 
 func (service *Service) createRoomRequestHandler(w http.ResponseWriter, r *http.Request) {
-	token := r.PostForm.Get("token")
-	log.Printf("Creating room(%v)\n", token)
-	if err := service.createRoom(token); err != nil {
+	// TODO remove this TOF!
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	token, ok := r.URL.Query()["token"]
+	if !ok || len(token) == 0 || len(token[0]) != 10 {
+		log.Printf("Bad token")
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte("Bad token"))
+		return
+	}
+	log.Printf("Creating room(%s)\n", token[0])
+	if err := service.createRoom(token[0]); err != nil {
 		log.Fatalf("Failed to create room(%v): %s\n", token, err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(err.Error()))
@@ -78,7 +87,25 @@ func (service *Service) register(conn *websocket.Conn) (*models.Player, *models.
 		}
 		service.connections[player.Token] = conn
 		log.Printf("Successfully registered player(%v) in room(%v)", player.Username, room.Token)
-		// TODO write response
+
+		log.Println("Sending initial data to the joined player")
+		game := service.getGame(room)
+		var tableCards []int
+		json.Unmarshal([]byte(game.Table), &tableCards)
+		cardsMessage := messages.UpdateCard{
+			Cards: tableCards,
+		}
+		conn.WriteMessage(1, cardsMessage.ToBytes())
+
+		var members []models.Player
+		service.getRoomPeople(room, &members)
+		for _, member := range members {
+			scoreMessage := messages.UpdateScore{
+				Username: member.Username,
+				Score:    member.Score,
+			}
+			conn.WriteMessage(1, scoreMessage.ToBytes())
+		}
 
 		return player, room
 	}
@@ -160,17 +187,20 @@ func (service *Service) play(player *models.Player, room *models.Room, conn *web
 				if conn == nil {
 					return
 				}
-				conn.WriteMessage(1, messages.UpdateScore{
+				updateScore := messages.UpdateScore{
 					Username: player.Username,
 					Score:    player.Score,
-				}.ToBytes())
-				conn.WriteMessage(1, messages.UpdateCard{
+				}
+				conn.WriteMessage(1, updateScore.ToBytes())
+				updateCard := messages.UpdateCard{
 					Cards: newCards,
-				}.ToBytes())
+				}
+				conn.WriteMessage(1, updateCard.ToBytes())
 				if endGame {
-					conn.WriteMessage(1, messages.EndGame{
+					endGame := messages.EndGame{
 						Winner: winner,
-					}.ToBytes())
+					}
+					conn.WriteMessage(1, endGame.ToBytes())
 				}
 			}(newCards, service.connections[listener.Token])
 		}
