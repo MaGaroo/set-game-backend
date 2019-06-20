@@ -42,7 +42,7 @@ func RemoveAndNormalize(table []int, gone []int, deck []int, positions []int) ([
 }
 
 func Normalize(table []int, gone []int, deck []int) ([]int, []int, []int, bool) {
-	for !HasSet(table) && len(deck) > 0 {
+	for (len(table) < 12 || !HasSet(table)) && len(deck) > 0 {
 		table, deck = showMoreFromDeck(table, deck)
 	}
 	return table, gone, deck, !HasSet(table)
