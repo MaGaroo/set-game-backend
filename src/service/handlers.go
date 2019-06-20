@@ -13,6 +13,17 @@ import (
 
 func (service *Service) setupRoutes() {
 	http.HandleFunc("/ws", service.wsEndpoint)
+	http.HandleFunc("/create-room", service.createRoomRequestHandler)
+}
+
+func (service *Service) createRoomRequestHandler(w http.ResponseWriter, r *http.Request) {
+	token := r.PostForm.Get("token")
+	if err := service.createRoom(token); err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(err.Error()))
+	} else {
+		w.WriteHeader(http.StatusCreated)
+	}
 }
 
 func (service *Service) wsEndpoint(w http.ResponseWriter, r *http.Request) {

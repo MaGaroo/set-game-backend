@@ -38,6 +38,10 @@ func PositionsMakeSet(cards []int, positions []int) bool {
 func RemoveAndNormalize(table []int, gone []int, deck []int, positions []int) ([]int, []int, []int, bool) {
 	gone = appendByPosition(gone, table, positions)
 	table = removeByPosition(table, positions)
+	return Normalize(table, gone, deck)
+}
+
+func Normalize(table []int, gone []int, deck []int) ([]int, []int, []int, bool) {
 	for !HasSet(table) && len(deck) > 0 {
 		table, deck = showMoreFromDeck(table, deck)
 	}

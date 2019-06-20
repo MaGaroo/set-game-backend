@@ -17,23 +17,41 @@ type Game struct {
 }
 
 func (game *Game) Start() error {
-	// table and gone cards will be empty
+	// table and gone deck will be empty
 	game.Table = "[]"
 	game.Gone = "[]"
 
-	var cards [81]int
+	deck := make([]int, 81)
+	gone := make([]int, 0)
+	table := make([]int, 0)
 	for i := 0; i < 81; i++ {
-		cards[i] = i
+		deck[i] = i
 	}
 	// TODO seed the rand package
-	rand.Shuffle(len(cards), func(i, j int) {
-		cards[i], cards[j] = cards[j], cards[i]
+	rand.Shuffle(len(deck), func(i, j int) {
+		deck[i], deck[j] = deck[j], deck[i]
 	})
-	bytesDeck, err := json.Marshal(cards)
+
+	table, gone, deck, _ = setgame.Normalize(table, gone, deck)
+
+	bytesDeck, err := json.Marshal(deck)
 	if err != nil {
 		return err
 	}
 	game.Deck = string(bytesDeck)
+
+	bytesTable, err := json.Marshal(table)
+	if err != nil {
+		return err
+	}
+	game.Table = string(bytesTable)
+
+	bytesGone, err := json.Marshal(gone)
+	if err != nil {
+		return err
+	}
+	game.Gone = string(bytesGone)
+
 	return nil
 }
 

@@ -18,6 +18,24 @@ func (service *Service) AutoMigrate() error {
 	return nil
 }
 
+func (service *Service) createRoom(token string) error {
+	// TODO take care of bad tokens
+	room := models.Room{
+		Token: token,
+	}
+	if err := service.DB.Create(&room).Error; err != nil {
+		return err
+	}
+	game := models.Game{
+		RoomID: room.ID,
+	}
+	game.Start()
+	if err := service.DB.Create(&game).Error; err != nil {
+		return err
+	}
+	return nil
+}
+
 func (service *Service) getOrCreatePlayer(playerToken string, username string, room *models.Room) (*models.Player, error) {
 	if player, err := service.getPlayer(playerToken); err != nil {
 		player, err = service.createPlayer(username, room)
