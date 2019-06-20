@@ -5,6 +5,7 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 	"net/http"
 	"github.com/gorilla/websocket"
+	"log"
 )
 
 type Service struct {
@@ -15,9 +16,11 @@ type Service struct {
 }
 
 func NewService(cfg *Config) (service *Service, err error) {
+	log.Println("Creating a new service")
 	service = &Service{}
 	err = nil
 
+	log.Printf("Openning database with address %s\n", cfg.DBAddress)
 	if service.DB, err = gorm.Open("sqlite3", cfg.DBAddress); err != nil {
 		return nil, err
 	}
@@ -30,6 +33,7 @@ func NewService(cfg *Config) (service *Service, err error) {
 	}
 
 	if err = service.AutoMigrate(); err != nil {
+		log.Fatalf("Migration failed with error %s\n", err.Error())
 		service.DB.Close()
 		return nil, err
 	}

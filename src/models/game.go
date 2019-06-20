@@ -5,6 +5,7 @@ import (
 	"math/rand"
 	"encoding/json"
 	"set-game/src/setgame"
+	"log"
 )
 
 type Game struct {

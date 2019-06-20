@@ -3,9 +3,11 @@ package service
 import (
 	"set-game/src/models"
 	"github.com/google/uuid"
+	"log"
 )
 
 func (service *Service) AutoMigrate() error {
+	log.Printf("Automigrating")
 	if err := service.DB.AutoMigrate(&models.Room{}).Error; err != nil {
 		return err
 	}
